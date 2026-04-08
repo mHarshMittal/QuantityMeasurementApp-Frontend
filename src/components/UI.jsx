@@ -1,6 +1,6 @@
 import React from 'react'
 
-/* ===== BUTTON ===== */
+/* BUTTON  */
 export function Button({ children, variant = 'primary', size = 'md', loading, className = '', ...props }) {
   const base = {
     display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
@@ -44,7 +44,7 @@ export function Button({ children, variant = 'primary', size = 'md', loading, cl
   )
 }
 
-/* ===== INPUT ===== */
+/* INPUT  */
 export function Input({ label, error, className = '', style = {}, ...props }) {
   const [focused, setFocused] = React.useState(false)
   return (
@@ -72,7 +72,7 @@ export function Input({ label, error, className = '', style = {}, ...props }) {
   )
 }
 
-/* ===== SELECT ===== */
+/* SELECT  */
 export function Select({ label, options = [], error, style = {}, ...props }) {
   const [focused, setFocused] = React.useState(false)
   return (
@@ -106,7 +106,7 @@ export function Select({ label, options = [], error, style = {}, ...props }) {
   )
 }
 
-/* ===== CARD ===== */
+/*  CARD  */
 export function Card({ children, style = {}, className = '', padding = '24px' }) {
   return (
     <div
@@ -121,7 +121,7 @@ export function Card({ children, style = {}, className = '', padding = '24px' })
   )
 }
 
-/* ===== BADGE ===== */
+/*  BADGE  */
 export function Badge({ op, error }) {
   const colors = {
     CONVERT:  { color: '#58a6ff', bg: 'rgba(88,166,255,0.15)' },
@@ -145,7 +145,7 @@ export function Badge({ op, error }) {
   )
 }
 
-/* ===== SPINNER ===== */
+/*  SPINNER */
 export function Spinner({ size = 20, color = 'var(--accent)' }) {
   return (
     <span style={{
@@ -159,7 +159,7 @@ export function Spinner({ size = 20, color = 'var(--accent)' }) {
   )
 }
 
-/* ===== ALERT ===== */
+/*  ALERT */
 export function Alert({ type = 'error', children }) {
   const styles = {
     error:   { color: 'var(--red)',   bg: 'var(--red-dim)',   border: 'rgba(248,81,73,0.3)' },
@@ -178,7 +178,7 @@ export function Alert({ type = 'error', children }) {
   )
 }
 
-/* ===== RESULT BOX ===== */
+/*  RESULT BOX  */
 export function ResultBox({ result }) {
   if (!result) return null
   const isError = result.error
@@ -228,7 +228,7 @@ export function ResultBox({ result }) {
   )
 }
 
-/* ===== PAGE HEADER ===== */
+/* PAGE HEADER */
 export function PageHeader({ title, subtitle }) {
   return (
     <div style={{ marginBottom: '28px' }}>
@@ -240,7 +240,7 @@ export function PageHeader({ title, subtitle }) {
   )
 }
 
-/* ===== SECTION LABEL ===== */
+/*  SECTION LABEL  */
 export function SectionLabel({ children }) {
   return (
     <div style={{
@@ -252,7 +252,7 @@ export function SectionLabel({ children }) {
   )
 }
 
-/* ===== DIVIDER WITH SYMBOL ===== */
+/*  DIVIDER WITH SYMBOL  */
 export function OpDivider({ symbol }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '16px', margin: '20px 0' }}>
@@ -270,7 +270,7 @@ export function OpDivider({ symbol }) {
   )
 }
 
-/* ===== QUANTITY ROW (value + unit selects) ===== */
+/*  QUANTITY ROW (value + unit selects)  */
 export function QuantityRow({ valueId, label, types, units, type, onTypeChange, unit, onUnitChange, value, onValueChange }) {
   return (
     <div>
