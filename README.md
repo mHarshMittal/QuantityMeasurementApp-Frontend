@@ -60,9 +60,3 @@ Open http://localhost:3000 in your browser.
 npm run build
 ```
 
-## Notes
-- Temperature does NOT support arithmetic (backend restriction)
-- Multiply treats the second value as a scalar multiplier
-- Divide returns a dimensionless ratio
-- JWT is stored in localStorage and auto-attached to all API calls
-- Vite proxy handles CORS by forwarding /api and /auth to localhost:8080
