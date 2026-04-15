@@ -5,19 +5,16 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
+    // For local development: proxy requests to your local API Gateway (port 8080)
     proxy: {
       '/api': {
-        //target: 'http://localhost:8080',
-        target: 'https://render.com/docs/web-services#port-binding',
-
+        target: 'http://localhost:8080',
         changeOrigin: true,
       },
       '/auth': {
-        //target: 'http://localhost:8080',
-        
-        target: 'https://render.com/docs/web-services#port-binding',
+        target: 'http://localhost:8080',
         changeOrigin: true,
-      }
-    }
-  }
+      },
+    },
+  },
 })
