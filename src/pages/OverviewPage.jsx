@@ -3,47 +3,31 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { quantityApi } from '../api/quantities'
 import { Card, Badge, Spinner, PageHeader } from '../components/UI'
-import { OP_META, OPERATIONS, formatValue, formatDate } from '../constants'
+import { formatValue, formatDate } from '../constants'
 
 const QUICK_ACTIONS = [
-  { icon: '⇄', label: 'Convert Units',    desc: 'Convert between units of the same type',   to: '/convert',    color: '#58a6ff' },
-  { icon: '⚖', label: 'Compare Values',   desc: 'Check if two quantities are equivalent',    to: '/compare',    color: '#3fb950' },
-  { icon: '+', label: 'Add',              desc: 'Sum two quantities together',                to: '/arithmetic', op: 'ADD',      color: '#f0883e' },
-  { icon: '−', label: 'Subtract',         desc: 'Subtract one quantity from another',         to: '/arithmetic', op: 'SUBTRACT', color: '#d2a8ff' },
-  { icon: '×', label: 'Multiply',         desc: 'Scale a quantity by a multiplier',           to: '/arithmetic', op: 'MULTIPLY', color: '#ffa657' },
-  { icon: '÷', label: 'Divide',           desc: 'Find the ratio of two quantities',           to: '/arithmetic', op: 'DIVIDE',   color: '#f85149' },
+  { icon: '⇄', label: 'Convert Units',  desc: 'Convert between units of the same type',   to: '/convert',    color: '#58a6ff' },
+  { icon: '⚖', label: 'Compare Values', desc: 'Check if two quantities are equivalent',    to: '/compare',    color: '#3fb950' },
+  { icon: '+', label: 'Add',            desc: 'Sum two quantities together',                to: '/arithmetic', op: 'ADD',      color: '#f0883e' },
+  { icon: '−', label: 'Subtract',       desc: 'Subtract one quantity from another',         to: '/arithmetic', op: 'SUBTRACT', color: '#d2a8ff' },
+  { icon: '×', label: 'Multiply',       desc: 'Scale a quantity by a multiplier',           to: '/arithmetic', op: 'MULTIPLY', color: '#ffa657' },
+  { icon: '÷', label: 'Divide',         desc: 'Find the ratio of two quantities',           to: '/arithmetic', op: 'DIVIDE',   color: '#f85149' },
 ]
 
 export default function OverviewPage() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [history, setHistory] = useState([])
-  const [counts, setCounts] = useState({})
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    Promise.all([
-      quantityApi.getHistory(),
-      ...OPERATIONS.map(op => quantityApi.getOperationCount(op).then(c => ({ op, c }))),
-    ]).then(([hist, ...opCounts]) => {
-      setHistory(hist)
-      const m = {}
-      opCounts.forEach(({ op, c }) => { m[op] = c })
-      setCounts(m)
-    }).catch(() => {}).finally(() => setLoading(false))
+    quantityApi.getHistory()
+      .then(data => setHistory(Array.isArray(data) ? data : []))
+      .catch(() => setHistory([]))
+      .finally(() => setLoading(false))
   }, [])
 
-  const totalOps   = history.length
-  const successful = history.filter(h => !h.error).length
-  const errors     = history.filter(h => h.error).length
-  const recent     = history.slice(0, 6)
-
-  const STATS = [
-    { label: 'Total Operations', value: totalOps,   color: 'var(--blue)',   icon: '📊' },
-    { label: 'Successful',       value: successful, color: 'var(--green)',  icon: '✅' },
-    { label: 'Conversions',      value: counts.CONVERT || 0, color: 'var(--accent)', icon: '⇄' },
-    { label: 'Errors',           value: errors,     color: 'var(--red)',    icon: '⚠' },
-  ]
+  const recent = history.slice(0, 6)
 
   return (
     <div className="animate-fadeUp">
@@ -52,27 +36,12 @@ export default function OverviewPage() {
         subtitle="Precision unit conversion and arithmetic at your fingertips"
       />
 
-      {/* Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '28px' }}>
-        {STATS.map(s => (
-          <Card key={s.label} style={{ padding: '20px' }}>
-            <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span>{s.icon}</span> {s.label}
-            </div>
-            {loading
-              ? <div style={{ height: '36px', background: 'var(--surface2)', borderRadius: '6px', animation: 'pulse 1.5s infinite' }} />
-              : <div style={{ fontFamily: 'var(--font-serif)', fontSize: '34px', color: s.color, lineHeight: 1 }}>{s.value}</div>
-            }
-          </Card>
-        ))}
-      </div>
-
       {/* Quick Actions */}
-      <div style={{ marginBottom: '10px' }}>
+      <div style={{ marginBottom: '32px' }}>
         <div style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.8px', color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: '14px' }}>
           Quick Actions
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '32px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
           {QUICK_ACTIONS.map(a => (
             <div
               key={a.label}
@@ -115,9 +84,7 @@ export default function OverviewPage() {
           padding: '16px 20px', borderBottom: '1px solid var(--border)',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}>
-          <div style={{ fontWeight: 600, fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            ⏱ Recent Activity
-          </div>
+          <div style={{ fontWeight: 600, fontSize: '14px' }}>⏱ Recent Activity</div>
           <button
             onClick={() => navigate('/history')}
             style={{ background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', fontSize: '13px', fontFamily: 'var(--font-sans)' }}
@@ -185,8 +152,10 @@ function HistoryRow({ h }) {
   }
 
   return (
-    <tr onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}
-        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+    <tr
+      onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}
+      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+    >
       <td style={{ padding: '12px 20px', borderBottom: '1px solid rgba(48,54,61,0.5)' }}>
         <Badge op={h.operation} error={h.error} />
       </td>

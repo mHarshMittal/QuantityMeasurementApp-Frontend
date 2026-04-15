@@ -63,7 +63,7 @@ export default function HistoryPage() {
     <div className="animate-fadeUp">
       <PageHeader
         title="⏱ History"
-        subtitle="All operations performed in this session"
+        subtitle="Your complete operation history"
       />
 
       {/* Toolbar */}
