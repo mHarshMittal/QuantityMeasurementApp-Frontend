@@ -5,15 +5,6 @@ import { quantityApi } from '../api/quantities'
 import { Card, Badge, Spinner, PageHeader } from '../components/UI'
 import { formatValue, formatDate } from '../constants'
 
-const QUICK_ACTIONS = [
-  { icon: '⇄', label: 'Convert Units',  desc: 'Convert between units of the same type',   to: '/convert',    color: '#58a6ff' },
-  { icon: '⚖', label: 'Compare Values', desc: 'Check if two quantities are equivalent',    to: '/compare',    color: '#3fb950' },
-  { icon: '+', label: 'Add',            desc: 'Sum two quantities together',                to: '/arithmetic', op: 'ADD',      color: '#f0883e' },
-  { icon: '−', label: 'Subtract',       desc: 'Subtract one quantity from another',         to: '/arithmetic', op: 'SUBTRACT', color: '#d2a8ff' },
-  { icon: '×', label: 'Multiply',       desc: 'Scale a quantity by a multiplier',           to: '/arithmetic', op: 'MULTIPLY', color: '#ffa657' },
-  { icon: '÷', label: 'Divide',         desc: 'Find the ratio of two quantities',           to: '/arithmetic', op: 'DIVIDE',   color: '#f85149' },
-]
-
 export default function OverviewPage() {
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -22,106 +13,77 @@ export default function OverviewPage() {
 
   useEffect(() => {
     quantityApi.getHistory()
-      .then(data => setHistory(Array.isArray(data) ? data : []))
+      .then(data => setHistory(Array.isArray(data) ? data.slice(0, 8) : []))
       .catch(() => setHistory([]))
       .finally(() => setLoading(false))
   }, [])
 
-  const recent = history.slice(0, 6)
+  const td = { padding: '11px 14px', borderBottom: '1px solid rgba(46,50,72,0.6)', verticalAlign: 'middle' }
 
   return (
-    <div className="animate-fadeUp">
-      <PageHeader
-        title={`Welcome back, ${user?.name?.split(' ')[0] || 'there'} 👋`}
-        subtitle="Precision unit conversion and arithmetic at your fingertips"
-      />
+    <div className="fade-in">
+      <PageHeader title={`Welcome, ${user?.name?.split(' ')[0] || 'there'} 👋`} subtitle="Precision unit conversion and arithmetic" />
 
-      {/* Quick Actions */}
-      <div style={{ marginBottom: '32px' }}>
-        <div style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.8px', color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: '14px' }}>
-          Quick Actions
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
-          {QUICK_ACTIONS.map(a => (
-            <div
-              key={a.label}
-              onClick={() => navigate(a.to, a.op ? { state: { op: a.op } } : {})}
-              style={{
-                background: 'var(--surface)', border: '1px solid var(--border)',
-                borderRadius: 'var(--radius)', padding: '20px',
-                cursor: 'pointer', transition: 'all 0.2s',
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.borderColor = a.color
-                e.currentTarget.style.transform = 'translateY(-2px)'
-                e.currentTarget.style.boxShadow = `0 8px 24px ${a.color}22`
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.borderColor = 'var(--border)'
-                e.currentTarget.style.transform = 'translateY(0)'
-                e.currentTarget.style.boxShadow = 'none'
-              }}
-            >
-              <div style={{
-                width: '40px', height: '40px', borderRadius: '10px',
-                background: `${a.color}18`, border: `1px solid ${a.color}33`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: '20px', marginBottom: '12px', color: a.color,
-                fontFamily: 'var(--font-mono)', fontWeight: 700,
-              }}>
-                {a.icon}
-              </div>
-              <div style={{ fontWeight: 600, fontSize: '14px', marginBottom: '4px' }}>{a.label}</div>
-              <div style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: 1.4 }}>{a.desc}</div>
-            </div>
-          ))}
-        </div>
+      {/* Actions */}
+      <div style={{ display: 'flex', gap: '10px', marginBottom: '28px', flexWrap: 'wrap' }}>
+        <ActionBtn icon="⌗" label="Calculate" desc="Convert, compare & arithmetic" color="var(--accent)" onClick={() => navigate('/calculate')} />
+        <ActionBtn icon="⏱" label="History"   desc="View past operations"          color="var(--accent2)" onClick={() => navigate('/history')} />
       </div>
 
-      {/* Recent History */}
+      {/* Recent */}
       <Card style={{ padding: 0, overflow: 'hidden' }}>
-        <div style={{
-          padding: '16px 20px', borderBottom: '1px solid var(--border)',
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        }}>
-          <div style={{ fontWeight: 600, fontSize: '14px' }}>⏱ Recent Activity</div>
-          <button
-            onClick={() => navigate('/history')}
-            style={{ background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', fontSize: '13px', fontFamily: 'var(--font-sans)' }}
-          >
-            View all →
-          </button>
+        <div style={{ padding: '13px 16px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontWeight: 600, fontSize: '14px' }}>Recent Activity</span>
+          <button onClick={() => navigate('/history')} style={{ background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', fontSize: '13px' }}>View all →</button>
         </div>
-
         {loading ? (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
-            <Spinner />
-          </div>
-        ) : recent.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '48px', color: 'var(--text-muted)' }}>
-            <div style={{ fontSize: '40px', marginBottom: '12px', opacity: 0.4 }}>📭</div>
-            <div style={{ fontWeight: 500, color: 'var(--text)' }}>No operations yet</div>
-            <div style={{ fontSize: '13px', marginTop: '4px' }}>Use any operation above to get started</div>
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '36px' }}><Spinner /></div>
+        ) : history.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '40px', color: 'var(--muted)' }}>
+            <div style={{ fontSize: '32px', marginBottom: '8px', opacity: 0.4 }}>📭</div>
+            <div style={{ fontWeight: 500 }}>No operations yet</div>
+            <div style={{ fontSize: '13px', marginTop: '4px' }}>
+              <button onClick={() => navigate('/calculate')} style={{ background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', fontSize: '13px', fontFamily: 'var(--font)' }}>
+                Start calculating →
+              </button>
+            </div>
           </div>
         ) : (
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
-                <tr>
+                <tr style={{ background: 'rgba(0,0,0,0.15)' }}>
                   {['Operation', 'Input', 'Result', 'Time'].map(h => (
-                    <th key={h} style={{
-                      textAlign: 'left', padding: '10px 20px',
-                      fontSize: '11px', fontWeight: 700, letterSpacing: '0.5px',
-                      textTransform: 'uppercase', color: 'var(--text-muted)',
-                      borderBottom: '1px solid var(--border)',
-                    }}>{h}</th>
+                    <th key={h} style={{ textAlign: 'left', padding: '8px 14px', fontSize: '11px', fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase', color: 'var(--dim)', borderBottom: '1px solid var(--border)' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {recent.map(h => (
-                  <HistoryRow key={h.id} h={h} />
-                ))}
+                {history.map(h => {
+                  const input = [
+                    h.thisValue != null ? `${formatValue(h.thisValue)} ${h.thisUnit || ''}` : null,
+                    h.thatValue != null ? `${formatValue(h.thatValue)} ${h.thatUnit || ''}` : null,
+                  ].filter(Boolean).join(' / ') || '—'
+                  const result = h.error ? (
+                    <span style={{ color: 'var(--red)', fontSize: '12px' }}>Error</span>
+                  ) : h.resultString != null ? (
+                    <span style={{ color: h.resultString === 'true' ? 'var(--green)' : 'var(--red)', fontWeight: 600, fontSize: '13px' }}>
+                      {h.resultString === 'true' ? '✓ Equal' : '✗ Not Equal'}
+                    </span>
+                  ) : h.resultValue != null ? (
+                    <span style={{ fontFamily: 'var(--mono)', color: 'var(--green)', fontSize: '13px' }}>
+                      {formatValue(h.resultValue)} <span style={{ color: 'var(--muted)', fontSize: '11px' }}>{h.resultUnit}</span>
+                    </span>
+                  ) : null
+                  return (
+                    <tr key={h.id} onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                      <td style={td}><Badge op={h.operation} error={h.error} /></td>
+                      <td style={{ ...td, fontFamily: 'var(--mono)', fontSize: '12px', color: 'var(--muted)' }}>{input}</td>
+                      <td style={td}>{result}</td>
+                      <td style={{ ...td, fontSize: '12px', color: 'var(--dim)', whiteSpace: 'nowrap' }}>{formatDate(h.createdAt)}</td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>
@@ -131,43 +93,19 @@ export default function OverviewPage() {
   )
 }
 
-function HistoryRow({ h }) {
-  const inputStr = [
-    h.thisValue != null ? `${formatValue(h.thisValue)} ${h.thisUnit || ''}` : null,
-    h.thatValue != null ? `${formatValue(h.thatValue)} ${h.thatUnit || ''}` : null,
-  ].filter(Boolean).join(' / ')
-
-  let resultContent
-  if (h.error) {
-    resultContent = <span style={{ color: 'var(--red)', fontSize: '12px' }}>{h.errorMessage || 'Error'}</span>
-  } else if (h.resultString != null) {
-    const eq = h.resultString === 'true'
-    resultContent = <span style={{ color: eq ? 'var(--green)' : 'var(--red)', fontWeight: 600 }}>{eq ? '✓ Equal' : '✗ Not Equal'}</span>
-  } else if (h.resultValue != null) {
-    resultContent = (
-      <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--green)', fontSize: '13px' }}>
-        {formatValue(h.resultValue)} <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>{h.resultUnit}</span>
-      </span>
-    )
-  }
-
+function ActionBtn({ icon, label, desc, color, onClick }) {
+  const [hover, setHover] = React.useState(false)
   return (
-    <tr
-      onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}
-      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-    >
-      <td style={{ padding: '12px 20px', borderBottom: '1px solid rgba(48,54,61,0.5)' }}>
-        <Badge op={h.operation} error={h.error} />
-      </td>
-      <td style={{ padding: '12px 20px', borderBottom: '1px solid rgba(48,54,61,0.5)', fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--text-muted)' }}>
-        {inputStr || '—'}
-      </td>
-      <td style={{ padding: '12px 20px', borderBottom: '1px solid rgba(48,54,61,0.5)' }}>
-        {resultContent}
-      </td>
-      <td style={{ padding: '12px 20px', borderBottom: '1px solid rgba(48,54,61,0.5)', fontSize: '12px', color: 'var(--text-dim)', whiteSpace: 'nowrap' }}>
-        {formatDate(h.createdAt)}
-      </td>
-    </tr>
+    <div onClick={onClick}
+      onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
+      style={{
+        flex: '1', minWidth: '180px', background: 'var(--surface)', border: `1px solid ${hover ? color : 'var(--border)'}`,
+        borderRadius: '10px', padding: '18px', cursor: 'pointer',
+        transform: hover ? 'translateY(-2px)' : 'translateY(0)', transition: 'all 0.15s',
+      }}>
+      <div style={{ fontSize: '22px', marginBottom: '8px' }}>{icon}</div>
+      <div style={{ fontWeight: 600, fontSize: '15px', marginBottom: '3px' }}>{label}</div>
+      <div style={{ fontSize: '12px', color: 'var(--muted)' }}>{desc}</div>
+    </div>
   )
 }
