@@ -3,7 +3,7 @@ import { useNavigate, Navigate, Link } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { useAuth } from '../context/AuthContext'
 import { authApi } from '../api/auth'
-import { Button, Input, Alert, Card } from '../components/UI'
+import { Button, Input, Alert } from '../components/UI'
 
 export default function RegisterPage() {
   const { isAuthenticated } = useAuth()
@@ -30,35 +30,75 @@ export default function RegisterPage() {
     }
   }
 
+  const set = (key) => (e) => setForm(f => ({ ...f, [key]: e.target.value }))
+
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-      <div className="fade-in" style={{ width: '100%', maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-        <Alert type="info">
-          <strong>Note:</strong> First request may take 30–60 seconds while the server wakes up.
-        </Alert>
-        <Card>
-          <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-            <div style={{ fontSize: '36px', marginBottom: '10px' }}>📐</div>
-            <h1 style={{ fontSize: '22px', fontWeight: 700, marginBottom: '4px' }}>Create Account</h1>
-            <p style={{ color: 'var(--muted)', fontSize: '14px' }}>Join QuantiMeasure today</p>
-          </div>
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            {error && <Alert type="error">{error}</Alert>}
-            <Input label="Full Name" type="text" placeholder="Jane Doe" value={form.name}
-              onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
-            <Input label="Email" type="email" placeholder="you@example.com" value={form.email}
-              onChange={e => setForm(f => ({ ...f, email: e.target.value }))} />
-            <Input label="Password" type="password" placeholder="Min. 6 characters" value={form.password}
-              onChange={e => setForm(f => ({ ...f, password: e.target.value }))} />
-            <Button type="submit" size="lg" loading={loading} style={{ marginTop: '6px' }}>
-              {loading ? 'Creating account…' : 'Create Account'}
-            </Button>
-          </form>
-          <p style={{ textAlign: 'center', marginTop: '20px', fontSize: '13px', color: 'var(--muted)' }}>
-            Already have an account?{' '}
-            <Link to="/login" style={{ color: 'var(--accent)', fontWeight: 600 }}>Sign in</Link>
+    <div style={{
+      minHeight: '100vh', display: 'flex', alignItems: 'center',
+      justifyContent: 'center', padding: '24px',
+    }}>
+      <div className="animate-fadeUp" style={{
+        width: '100%', maxWidth: '420px',
+        background: 'var(--surface)', border: '1px solid var(--border)',
+        borderRadius: '20px', padding: '44px 40px',
+        boxShadow: 'var(--shadow)',
+      }}>
+        {/* Logo */}
+        <div style={{ textAlign: 'center', marginBottom: '36px' }}>
+          <div style={{
+            width: '58px', height: '58px',
+            background: 'linear-gradient(135deg, var(--accent) 0%, #d97706 100%)',
+            borderRadius: '16px', display: 'inline-flex',
+            alignItems: 'center', justifyContent: 'center',
+            fontSize: '28px', marginBottom: '14px',
+          }}>📐</div>
+          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '26px', letterSpacing: '-0.4px' }}>
+            Create Account
+          </h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: '13px', marginTop: '5px' }}>
+            Join QuantiMeasure today
           </p>
-        </Card>
+        </div>
+
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {error && <Alert type="error">{error}</Alert>}
+
+          <Input
+            label="Full Name"
+            type="text"
+            placeholder="Jane Doe"
+            value={form.name}
+            onChange={set('name')}
+            autoComplete="name"
+          />
+          <Input
+            label="Email Address"
+            type="email"
+            placeholder="you@example.com"
+            value={form.email}
+            onChange={set('email')}
+            autoComplete="email"
+          />
+          <Input
+            label="Password"
+            type="password"
+            placeholder="Min. 6 characters"
+            value={form.password}
+            onChange={set('password')}
+            autoComplete="new-password"
+          />
+
+          <Button type="submit" size="lg" loading={loading} style={{ marginTop: '4px' }}>
+            {loading ? 'Creating account…' : 'Create Account'}
+          </Button>
+        </form>
+
+        <p style={{ textAlign: 'center', marginTop: '24px', fontSize: '13px', color: 'var(--text-muted)' }}>
+          Already have an account?{' '}
+          <Link to="/login" style={{ color: 'var(--accent)', textDecoration: 'none', fontWeight: 500 }}>
+            Sign in
+          </Link>
+        </p>
       </div>
     </div>
   )
