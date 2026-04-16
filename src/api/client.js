@@ -3,7 +3,7 @@ import axios from 'axios'
 // IMPORTANT: Set VITE_API_GATEWAY_URL in Vercel → Settings → Environment Variables
 // Value: your deployed API Gateway URL on Render
 // Example: https://api-gateway-xxxx.onrender.com
-const BASE_URL = import.meta.env.VITE_API_GATEWAY_URL || ''
+const BASE_URL = import.meta.env.VITE_API_GATEWAY_URL || 'https://api-gateway-7065.onrender.com'
 
 const client = axios.create({
   baseURL: BASE_URL,
